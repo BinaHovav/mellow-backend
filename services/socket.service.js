@@ -22,6 +22,7 @@ export function setupSocketAPI(http) {
             }
             socket.join(topic)
             socket.myTopic = topic
+            logger.info(`Socket is entered topic ${socket.myTopic} [id: ${socket.id}]`)
         })
         socket.on('chat-send-msg', msg => {
             logger.info(`New chat msg from socket [id: ${socket.id}], emitting to topic ${socket.myTopic}`)
@@ -42,6 +43,14 @@ export function setupSocketAPI(http) {
         socket.on('unset-user-socket', () => {
             logger.info(`Removing socket.userId for socket [id: ${socket.id}]`)
             delete socket.userId
+        })
+        socket.on('unset-user-socket', () => {
+            logger.info(`Removing socket.userId for socket [id: ${socket.id}]`)
+            delete socket.userId
+        })
+        socket.on('update-board', () => {
+            logger.info(`Updating board [id: ${socket.id}]`)
+            broadcast({type: 'update-board', room: socket.myTopic, userId: socket.userId})
         })
 
     })
@@ -68,7 +77,7 @@ async function emitToUser({ type, data, userId }) {
 // If possible, send to all sockets BUT not the current socket 
 // Optionally, broadcast to a room / to all
 async function broadcast({ type, data, room = null, userId }) {
-    userId = userId.toString()
+    userId = userId?.toString()
     
     logger.info(`Broadcasting event: ${type}`)
     const excludedSocket = await _getUserSocket(userId)

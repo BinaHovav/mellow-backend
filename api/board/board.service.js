@@ -68,6 +68,7 @@ async function update(board) {
       members: board.members,
       groups: board.groups,
       activities: board.activities,
+      labelAnimation: board.labelAnimation
     }
     const collection = await dbService.getCollection('board')
     await collection.updateOne({ _id: ObjectId(board._id) }, { $set: boardToSave })
